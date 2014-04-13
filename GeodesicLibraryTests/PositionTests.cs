@@ -77,5 +77,21 @@ namespace GeodesicLibraryTests
             Assert.AreEqual(expectedValue, roundedDistance);
 
         }
+
+        [TestMethod]
+        public void InitialBearingTest()
+        {
+            double expectedValue = 9.120;
+
+            Position fromPosition = new Position(50.066389, -5.714722);
+            Position toPosition = new Position(58.643889, -3.07);
+
+            double testValue = fromPosition.InitialBearing(toPosition);
+
+            double roundedBearing = Math.Round(testValue, 3);
+
+            Assert.AreEqual(expectedValue, roundedBearing);
+
+        }
     }
 }

@@ -77,9 +77,9 @@ namespace Marknotgeorge.GeodesicLibrary
         /// Returns the distance from this Position to the supplied Position, using the Haversine
         /// formula.
         /// </summary>
-        /// <param name="toPosition">The destination point.</param>
+        /// <param name="toPosition">The destination Position.</param>
         /// <param name="unit">The unit of the distance. Defaults to kilometres</param>
-        /// <returns></returns>
+        /// <returns>The distance, in the units specified by the unit parameter</returns>
         public double DistanceTo(Position toPosition, LengthUnit unit = LengthUnit.Kilometer)
         {
             var lat1 = this._latitude.Radians; var lat2 = toPosition._latitude.Radians;
@@ -96,7 +96,26 @@ namespace Marknotgeorge.GeodesicLibrary
             var d = R * c;
 
             return d;
-        }     
+        }   
+  
+        /// <summary>
+        /// Returns the (initial) bearing from this position to the supplied position, in degrees
+        /// see http://williams.best.vwh.net/avform.htm#Crs
+        /// </summary>
+        /// <param name="toPosition">The destination Position</param>
+        /// <returns>Initial bearing, in degrees clockwise from North</returns>        
+        public double InitialBearing(Position toPosition)
+        {
+            var lat1 = this._latitude.Radians; var lat2 = toPosition._latitude.Radians;
+            var dLon = (toPosition._longitude - this._longitude).Radians;
+
+            var y = Math.Sin(dLon) * Math.Cos(lat2);
+            var x = Math.Cos(lat1) * Math.Sin(lat2) -
+                    Math.Sin(lat1) * Math.Cos(lat2) * Math.Cos(dLon);
+            Angle brng = Angle.FromRadians(Math.Atan2(y, x));
+
+            return (brng.Degrees + 360) % 360;
+        }
 
 
     }
