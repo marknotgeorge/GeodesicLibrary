@@ -22,6 +22,8 @@ namespace GeodesicLibraryTests
             //
         }
 
+        private double delta = 0.1; 
+
         private TestContext testContextInstance;
 
         /// <summary>
@@ -72,26 +74,87 @@ namespace GeodesicLibraryTests
 
             double testValue = fromPosition.DistanceTo(toPosition);
 
-            double roundedDistance = Math.Round(testValue, 1);
+            
 
-            Assert.AreEqual(expectedValue, roundedDistance);
+            Assert.AreEqual(expectedValue, testValue, delta);
 
         }
 
         [TestMethod]
         public void InitialBearingTest()
         {
-            double expectedValue = 9.120;
+            double expectedValue = 9.119722;
 
             Position fromPosition = new Position(50.066389, -5.714722);
             Position toPosition = new Position(58.643889, -3.07);
 
             double testValue = fromPosition.InitialBearing(toPosition);
 
-            double roundedBearing = Math.Round(testValue, 3);
+            Assert.AreEqual(expectedValue, testValue, delta);
 
-            Assert.AreEqual(expectedValue, roundedBearing);
+        }
 
+        [TestMethod]
+        public void FinalBearingTest()
+        {
+            double expectedValue = 11.275278;
+
+            Position fromPosition = new Position(50.066389, -5.714722);
+            Position toPosition = new Position(58.643889, -3.07);
+
+            double testValue = fromPosition.FinalBearing(toPosition);
+            
+
+            Assert.AreEqual(expectedValue, testValue, delta);
+
+        }
+
+        [TestMethod]
+        public void MidpointTest()
+        {
+            double expectedLat = 54.362222;
+            double expectedLon = -4.530556;
+
+            Position fromPosition = new Position(50.066389, -5.714722);
+            Position toPosition = new Position(58.643889, -3.07);
+
+            Position testValue = fromPosition.MidpointTo(toPosition);
+
+            Assert.AreEqual(expectedLat, testValue.Latitude, delta);
+            Assert.AreEqual(expectedLon, testValue.Longitude, delta);
+        }
+
+        [TestMethod]
+        public void DestinationTest()
+        {
+            double expectedLat = 53.188333;
+            double expectedLon = 0.133333;
+
+            Position fromPosition = new Position(53.320556, -1.729722);
+            double bearing = 96.021667;
+            double distance = 124.8; // km
+
+            Position testValue  = fromPosition.Destination(bearing, distance);           
+
+            Assert.AreEqual(expectedLat, testValue.Latitude, delta);
+            Assert.AreEqual(expectedLon, testValue.Longitude, delta);
+        }
+
+        [TestMethod]
+        public void IntersectionTest()
+        {
+            double expectedLat = 50.901667;
+            double expectedLon = 4.494167;
+
+            Position firstPosition = new Position(51.885, 0.235);
+            Position secondPosition = new Position(49.008, 2.549);
+            double firstBearing = 108.63;
+            double secondBearing = 32.72;
+
+            Position testValue = firstPosition.Intersection(firstBearing, secondPosition, secondBearing);
+
+            Assert.AreEqual(expectedLat, testValue.Latitude, delta);
+            Assert.AreEqual(expectedLon, testValue.Longitude, delta);
         }
     }
 }
