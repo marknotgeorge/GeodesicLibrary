@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("GeodesicLibrary")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A C# library of geodesic methods based upon JavaScript code written by Chris Veness")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("marknotgeorge")]
 [assembly: AssemblyProduct("GeodesicLibrary")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
+[assembly: AssemblyCopyright("Copyright ©2014 Mark Johnson. Original JavaScript ©2002-2012 Chris Veness")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: NeutralResourcesLanguage("en")]
