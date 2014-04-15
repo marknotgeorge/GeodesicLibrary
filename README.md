@@ -37,7 +37,7 @@ The source code gives summaries of the relevant methods.
 
 ###Units
 
-Latitude and longitude are in degrees. Bearings are also in degrees, clockwide from North. Distances default to kilometres, but can optionally be any LengthUnit specified in UnitsNet. UnitsNet also allows custom units, but these haven't been tested.
+Latitude and longitude are in degrees. Bearings are also in degrees, clockwise from North. Distances default to kilometres, but can optionally be any LengthUnit specified in UnitsNet. UnitsNet also allows custom units, but these haven't been tested.
 
 Examples
 --------
@@ -64,5 +64,5 @@ Position intersection = ArnosGrove.Intersection(270, Hammersmith, 0); // West is
 Licence
 -------
 
-GeodesicLibrary is free to use and modify for your own use, as long as you retain both mime and Chris Veness's copyright notices.
+GeodesicLibrary is free to use and modify for your own use, as long as you retain both mine and Chris Veness's copyright notices.
 
