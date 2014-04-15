@@ -22,7 +22,7 @@ namespace GeodesicLibraryTests
             //
         }
 
-        private double delta = 0.1; 
+        private double delta = 0.9; 
 
         private TestContext testContextInstance;
 
@@ -156,5 +156,65 @@ namespace GeodesicLibraryTests
             Assert.AreEqual(expectedLat, testValue.Latitude, delta);
             Assert.AreEqual(expectedLon, testValue.Longitude, delta);
         }
+
+        [TestMethod]
+        public void RhumbDistanceTest()
+        {
+            double expectedValue = 5196;
+
+            Position fromPosition = new Position(50.363889, -4.156944);
+            Position toPosition = new Position(42.351111, -71.040833);
+
+            double testValue = fromPosition.RhumbDistanceTo(toPosition);
+
+            Assert.AreEqual(expectedValue, testValue, delta);
+        }
+
+        [TestMethod]
+        public void RhumbBearingTest()
+        {
+            double expectedValue = 260.127222;
+
+            Position fromPosition = new Position(50.363889, -4.156944);
+            Position toPosition = new Position(42.351111, -71.040833);
+
+            double testValue = fromPosition.RhumbBearingTo(toPosition);
+
+            Assert.AreEqual(expectedValue, testValue, delta);
+        }
+
+        [TestMethod]
+        public void RhumbDestinationTest()
+        {
+            double expectedLat = 50.963333;
+            double expectedLon = 1.8525;
+
+            Position fromPosition = new Position(51.125556, 1.338056);
+            double bearing = 116.636111;
+            double distance = 40.23; // km
+
+            Position testValue = fromPosition.Destination(bearing, distance);
+
+            Assert.AreEqual(expectedLat, testValue.Latitude, delta);
+            Assert.AreEqual(expectedLon, testValue.Longitude, delta);
+        }
+
+        [TestMethod]
+        public void RhumbMidpointTest()
+        {
+            double expectedLat = 46.3575;
+            double expectedLon = -38.8275;
+
+            Position fromPosition = new Position(50.363889, -4.156944);
+            Position toPosition = new Position(42.351111, -71.040833);
+
+            Position testValue = fromPosition.RhumbMidpointTo(toPosition);
+
+            Assert.AreEqual(expectedLat, testValue.Latitude, delta);
+            Assert.AreEqual(expectedLon, testValue.Longitude, delta);
+        }
+
+
+
     }
 }

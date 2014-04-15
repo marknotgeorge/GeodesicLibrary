@@ -47,10 +47,13 @@ namespace Marknotgeorge.GeodesicLibrary
             }
         }
 
+        /// <summary>
+        /// The mean radius of the Earth - 6371km.
+        /// </summary>
         private Length _radius = Length.FromKilometers(6371);
 
         /// <summary>
-        /// Initialise a Position, using the default radius of 6371km.
+        /// Initialise a Position.
         /// </summary>
         /// <param name="lat">Latitude in degrees</param>
         /// <param name="lon">Longitude in degrees</param>
@@ -60,19 +63,7 @@ namespace Marknotgeorge.GeodesicLibrary
             Longitude = lon;
         }
 
-        /// <summary>
-        /// Initialise a Position with a specific radius.
-        /// </summary>
-        /// <param name="lat">Latitude in degrees.</param>
-        /// <param name="lon">Longitude in degrees.</param>
-        /// <param name="radius">Radius of Earth in kilometres.</param>
-        public Position(double lat, double lon, double radius)
-        {
-            Latitude = lat;
-            Longitude = lon;
-            _radius = Length.FromKilometers(radius);
-        }
-
+        
         /// <summary>
         /// Returns the distance from this Position to the supplied Position, using the Haversine
         /// formula.
@@ -257,6 +248,122 @@ namespace Marknotgeorge.GeodesicLibrary
                 Math.Cos(dist13) - Math.Sin(lat1) * Math.Sin(lat3.Radians));
             double midLon = lon1 + dLon13;
             Angle lon3 = Angle.FromRadians((midLon + 3 * Math.PI) % (2 * Math.PI) - Math.PI);
+
+            return new Position(lat3.Degrees, lon3.Degrees);
+        }
+
+        /// <summary>
+        /// Returns the distance from this Position to the supplied Point travelling along a rhumb line
+        ///
+        /// see http://williams.best.vwh.net/avform.htm#Rhumb
+        /// </summary>
+        /// <param name="toPosition">The destination Position.</param>
+        /// <param name="unit">The unit of the distance. Defaults to km.</param>
+        /// <returns>The distance in the units specified.</returns>
+        public double RhumbDistanceTo(Position toPosition, LengthUnit unit = LengthUnit.Kilometer)
+        {
+            double lat1 = this._latitude.Radians; var lat2 = toPosition._latitude.Radians;            
+            double R = _radius.As(unit);
+            double dLat = (toPosition._latitude - this._latitude).Radians;
+            double dLon = (toPosition._longitude - this._longitude).Radians;
+
+            double dPhi = Math.Log(Math.Tan(lat2 / 2 + Math.PI / 4) / Math.Tan(lat1 / 2 + Math.PI / 4));
+            double q = (!double.IsInfinity(dLat / dPhi)) ? dLat / dPhi : Math.Cos(lat1);  // E-W line gives dPhi=0
+
+            // if dLon over 180° take shorter rhumb across anti-meridian:
+            if (Math.Abs(dLon) > Math.PI)
+            {
+                dLon = dLon > 0 ? -(2 * Math.PI - dLon) : (2 * Math.PI + dLon);
+            }
+
+            double dist = Math.Sqrt(dLat * dLat + q * q * dLon * dLon) * R;
+
+            return dist;
+        }
+
+        /// <summary>
+        /// Returns the bearing from this point to the supplied point along a rhumb line, in degrees.
+        /// </summary>
+        /// <param name="toPosition"></param>
+        /// <returns>Bearing in degrees from North.</returns>
+        public double RhumbBearingTo(Position toPosition)
+        {
+            double lat1 = this._latitude.Radians; double lat2 = toPosition._latitude.Radians;
+            double dLon = (toPosition._longitude - this._longitude).Radians;
+
+            double dPhi = Math.Log(Math.Tan(lat2 / 2 + Math.PI / 4) / Math.Tan(lat1 / 2 + Math.PI / 4));
+            if (Math.Abs(dLon) > Math.PI) dLon = dLon > 0 ? -(2 * Math.PI - dLon) : (2 * Math.PI + dLon);
+            Angle brng = Angle.FromRadians(Math.Atan2(dLon, dPhi));
+
+            return (brng.Degrees + 360) % 360;
+        }
+
+        /// <summary>
+        /// Returns the destination point from this point having travelled the given distance (in the given unit) 
+        /// on the given bearing along a rhumb line
+        /// </summary>
+        /// <param name="bearing">Bearing in degrees from North.</param>
+        /// <param name="distance">Distance</param>
+        /// <param name="unit">Unit of Distance. Defaults to km</param>
+        /// <returns></returns>
+        public Position RhumbDestination(double bearing, double distance, LengthUnit unit = LengthUnit.Kilometer)
+        {
+            double R = _radius.As(unit);
+            double d = distance / R; // Angular distance covered on the Earth's surface.
+
+            double lat1 = this._latitude.Radians; double lon1 = this._longitude.Radians;
+            Angle brng = Angle.FromDegrees(bearing);
+
+            var dLat = d * Math.Cos(brng.Radians);
+            // nasty kludge to overcome ill-conditioned results around parallels of latitude:
+            if (Math.Abs(dLat) < 1e-10) dLat = 0; // dLat < 1 mm
+
+            double midLat = lat1 + dLat;
+            double dPhi = Math.Log(Math.Tan(midLat / 2 + Math.PI / 4) / Math.Tan(lat1 / 2 + Math.PI / 4));
+            double q = (!double.IsInfinity(dLat / dPhi)) ? dLat / dPhi : Math.Cos(lat1);  // E-W line gives dPhi=0
+            var dLon = d * Math.Sin(brng.Radians) / q;
+
+            // check for some daft bugger going past the pole, normalise latitude if so
+            if (Math.Abs(midLat) > Math.PI / 2) 
+                midLat = midLat > 0 ? Math.PI - midLat : -Math.PI - midLat;
+
+            double midLon = (lon1 + dLon + 3 * Math.PI) % (2 * Math.PI) - Math.PI;
+
+            Angle lat2 = Angle.FromRadians(midLat);
+            Angle lon2 = Angle.FromRadians(midLon);
+
+            return new Position(lat2.Degrees, lon2.Degrees);
+
+        }
+
+        /// <summary>
+        /// Returns the loxodromic midpoint (along a rhumb line) between this Position and the supplied Position.
+        /// see http://mathforum.org/kb/message.jspa?messageID=148837
+        /// </summary>
+        /// <param name="toPosition">Destination Position</param>
+        /// <returns>Midpoint between this Position and the supplied position</returns>
+        public Position RhumbMidpointTo(Position toPosition)
+        {
+            double lat1 = this._latitude.Radians; double lat2 = toPosition._latitude.Radians;
+            double lon1 = this._longitude.Radians; double lon2 = toPosition._longitude.Radians;
+
+            if (Math.Abs(lon2 - lon1) > Math.PI) 
+                lon1 += 2 * Math.PI; // crossing anti-meridian
+
+            double midLat = (lat1 + lat2) / 2;
+            double f1 = Math.Tan(Math.PI / 4 + lat1 / 2);
+            double f2 = Math.Tan(Math.PI / 4 + lat2 / 2);
+            double f3 = Math.Tan(Math.PI / 4 + midLat / 2);
+            double midLon = ((lon2 - lon1) * Math.Log(f3) + lon1 * Math.Log(f2) -
+                lon2 * Math.Log(f1)) / Math.Log(f2 / f1);
+
+            if (double.IsInfinity(midLon))
+                midLon = (lon1 + lon2) / 2; // parallel of latitude
+
+            midLon = (midLon + 3 * Math.PI) % (2 * Math.PI) - Math.PI;  // normalise to -180..+180º
+
+            Angle lat3 = Angle.FromRadians(midLat);
+            Angle lon3 = Angle.FromRadians(midLon);
 
             return new Position(lat3.Degrees, lon3.Degrees);
         }
