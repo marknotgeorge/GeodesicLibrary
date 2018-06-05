@@ -157,3 +157,8 @@ $RECYCLE.BIN/
 
 #NuGet packages
 *.nupkg
+/GeodesicLibraryOld
+/GeodesicLibraryTestsOld
+/UnitTestProject1
+/.vs/GeodesicLibrary/v15/Server/sqlite3
+/.vs/GeodesicLibrary/DesignTimeBuild
