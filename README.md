@@ -52,7 +52,7 @@ double finalBearing = ArnosGrove.FinalBearing(Hammersmith);
 Position midPoint = ArnosGrove.MidpointTo(Hammersmith);
 
 // Show the position 5km due east of ArnosGrove, using a great circle
-Position dueEast = ArnosGrove.DestinationTo(90, 5); // East is 90 degrees.
+Position dueEast = ArnosGrove.Destination(90, 5); // East is 90 degrees.
 
 // The distance between ArnosGrove and Hammersmith along a rhumb line (a line of constant bearing) in feet.
 double distance = ArnosGrove.RhumbDistanceTo(Hammersmith, LengthUnit.Foot);
