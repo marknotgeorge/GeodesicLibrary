@@ -1,7 +1,7 @@
 GeodesicLibrary
 ===============
 
-A C# PCL library to implement the JavaScript geodesic scripts written by Chris Veness. The original JavaScript scripts can be obtained from http://www.movable-type.co.uk/scripts/latlong.html, along with further explanation of the maths behind them. The main changes are that I am using UnitsNet (https://github.com/InitialForce/UnitsNet) to simplify unit conversions such as degrees to radians, as well as to cater for differing length units (The original scripts are based around kilometres).
+A C# Net Standard library to implement the JavaScript geodesic scripts written by Chris Veness. The original JavaScript scripts can be obtained from http://www.movable-type.co.uk/scripts/latlong.html, along with further explanation of the maths behind them. The main changes are that I am using UnitsNet (https://github.com/InitialForce/UnitsNet) to simplify unit conversions such as degrees to radians, as well as to cater for differing length units (The original scripts are based around kilometres).
 
 Usage
 -----
@@ -35,7 +35,8 @@ The methods I have implemented are:
 The source code gives summaries of the relevant methods.
 
 
-###Units
+Units
+-----
 
 Latitude and longitude are in degrees. Bearings are also in degrees, clockwise from North. Distances default to kilometres, but can optionally be any LengthUnit specified in UnitsNet. UnitsNet also allows custom units, but these haven't been tested.
 
@@ -64,5 +65,5 @@ Position intersection = ArnosGrove.Intersection(270, Hammersmith, 0); // West is
 Licence
 -------
 
-GeodesicLibrary is free to use and modify for your own use, as long as you retain both mine and Chris Veness's copyright notices.
+GeodesicLibrary is licenced under the MIT Licence
 
